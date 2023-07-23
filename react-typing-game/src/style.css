@@ -1,0 +1,138 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --primaryColor: #E2B714;
+  --textSecondary: #646669;
+  --textPrimar: #D1D0C5;
+}
+
+body {
+  margin: 0;
+  background-color: #323437;
+  color: #D1D0C5;
+  display: flex;
+  justify-content: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  /*border: 1px solid red;*/
+  width: 83svw;
+  height: 90svh;
+}
+
+h1 {
+  font-size: 2em;
+  line-height: 1.1;
+  font-family: Lexend Deca, sans-serif;
+  margin-bottom: auto;
+}
+
+#game {
+  margin-bottom: 21rem;
+  /*border: 1px solid blue;*/
+  font-family: 'Roboto Mono';
+  font-size: 1rem;
+  position: relative;
+}
+
+h2 {
+  margin-bottom: 0;
+  margin-top: auto;
+  color: #e2b714;
+  font-size: 1.5rem;
+  font-family: 'Roboto Mono', sans-serif;
+}
+
+.focus {
+  position: absolute;
+  inset: 0;
+  color: #D1D0C5;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.text {
+  margin: 0;
+  font-size: 1.4rem;
+  white-space: pre-wrap;
+  color: #646669;
+  /*border: 1px solid green;*/
+  line-height: 35px;
+  height: 105px;
+  overflow: hidden;
+  font-family: 'Roboto Mono';
+  filter: blur(5px);
+}
+#game:focus {
+  outline: 0;
+}
+#game:focus .text{
+  filter: none;
+}
+#game:focus .focus {
+  display: none;
+}
+
+.token {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.token-incorrect {
+  background-image: linear-gradient(to bottom, #ca4754, #ca4754);
+  background-size: 100% 2px; 
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-clip: content-box;
+}
+
+.correct {
+  color: #D1D0C5;
+}
+
+.incorrect {
+  color: #ca4754;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+#cursor {
+  display: none;
+  position:fixed;
+  width: 0.1em;
+  height: 1.6rem;
+  border-radius: 0.5rem;
+  background-color: #e2b714;
+  animation: blink 1s infinite;
+}
+
+#game:focus #cursor {
+  display: block;
+}
