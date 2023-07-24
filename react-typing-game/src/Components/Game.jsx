@@ -21,9 +21,10 @@ export default function Game(props) {
         return modifiedLine;
     })
 
+
     useEffect(() => {
-        charCursorRef.current = document.querySelector('.char');
-        prevCursorRef.current = document.querySelector('.char');
+        charCursorRef.current = document.getElementById('cursor')
+        prevCursorRef.current = document.querySelector('.char')
         tokenCursorRef.current = document.querySelector('.token')
     }, []);
 
@@ -39,18 +40,29 @@ export default function Game(props) {
         const currentChar = currentCharIndex === currentToken.length 
             ? currentTokenIndex+1 === currentLine.length ? 'Enter' : ' '
             : currentToken[currentCharIndex]
+
+        if (props.gameOver) {
+            return
+        }
         
+        if (currentLineIndex === 0 && currentTokenIndex === 0 && currentCharIndex === 0) {
+           if (!isChar) {
+            return
+           } else {
+            props.startTimer()
+           }
+        }
         
         //console.log({key, currentChar, charCursorRef, prevCursorRef})
         //console.log({currentCharIndex, currentToken})
         //console.log({currentLine, currentToken, currentChar})
 
         if (isChar) {
-            if (key === currentChar) { //correct letter typed
+            if (key === currentChar) { //correct character typed
                 updateCharMap(true, currentTokenIndex, currentCharIndex)
                 setCurrentCharIndex(prevCharIndex => prevCharIndex+1)
-            } else if (currentChar === ' ' || currentChar === 'Enter') { //expected space or enter but got extra letter
-                let i = 0//need i to be the index of thelast letter in the string form of the line
+            } else if (currentChar === ' ' || currentChar === 'Enter') { //expected space or enter but got extra character
+                let i = 0//need i to be the index of the last character in the string form of the line
                 let spaces = 0
                 while (spaces < currentTokenIndex+1 && i <= lines[currentLineIndex].length) {
                     if (lines[currentLineIndex][i] === ' ') {
@@ -220,40 +232,41 @@ export default function Game(props) {
                 left: charCursorRef.current.getBoundingClientRect().left
             });
         }
-    }, [currentLineIndex, currentCharIndex, currentTokenIndex]);   
-    
+    }, [currentLineIndex, currentCharIndex, currentTokenIndex]);
+
+    console.log(cursorPosition)
 
     return (
-        <div id="game" tabIndex="0">
-            <div className="text"
-                style={{
-                    marginTop: `${linePosition}px`
-                }}
-            >
-                {lines.map((line, index) => (
-                    <Line
-                        key={index}
-                        isCurrent={index === currentLineIndex}
-                        tokens={line}
-                        index={index}
-                        currentTokenIndex={currentTokenIndex}
-                        currentCharIndex={currentCharIndex}
-                        correctCharMap={charCorrectMap[index]}
-                        correctTokenMap={tokenCorrectMap[index]}
-                        charCursorRef={charCursorRef}
-                        prevCursorRef={prevCursorRef}
-                        tokenCursorRef={tokenCursorRef}
-                    />
-                ))}
+            <div id="game" tabIndex="0" className={props.gameOver ? 'over' : ''}>
+                <div className="text"
+                    style={{
+                        marginTop: `${linePosition}px`
+                    }}
+                >
+                    {lines.map((line, index) => (
+                        <Line
+                            key={index}
+                            isCurrent={index === currentLineIndex}
+                            tokens={line}
+                            index={index}
+                            currentTokenIndex={currentTokenIndex}
+                            currentCharIndex={currentCharIndex}
+                            correctCharMap={charCorrectMap[index]}
+                            correctTokenMap={tokenCorrectMap[index]}
+                            charCursorRef={charCursorRef}
+                            prevCursorRef={prevCursorRef}
+                            tokenCursorRef={tokenCursorRef}
+                        />
+                    ))}
+                </div>
+                <div id="cursor"
+                    style={{
+                        position: cursorPosition?.top !== 0 ? 'fixed' : 'absolute',
+                        top: cursorPosition?.top || 3,
+                        left: cursorPosition?.left || 0
+                    }}
+                />
+                <div className="focus">Click here to focus</div>
             </div>
-            <div id="cursor"
-                style={{
-                    position: cursorPosition?.top !== 0 ? 'fixed' : 'absolute',
-                    top: cursorPosition?.top || 3,
-                    left: cursorPosition?.left || 0
-                }}
-            />
-            <div className="focus">Click here to focus</div>
-        </div>
     )
 }

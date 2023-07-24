@@ -55,6 +55,10 @@ h1 {
   height: 105px;
 }
 
+#game.over {
+  opacity: .5;
+}
+
 h2 {
   margin-bottom: 0;
   margin-top: auto;
@@ -85,10 +89,10 @@ h2 {
 #game:focus {
   outline: 0;
 }
-#game:focus .text{
+#game:focus .text, #game.over .text{
   filter: none;
 }
-#game:focus .focus {
+#game:focus .focus, #game.over .focus {
   display: none;
 }
 
@@ -127,7 +131,6 @@ h2 {
 
 #cursor {
   display: none;
-  position:fixed;
   width: 0.1em;
   height: 1.6rem;
   border-radius: 0.5rem;
@@ -137,4 +140,8 @@ h2 {
 
 #game:focus #cursor {
   display: block;
+}
+
+#game.over:focus #cursor {
+  display: none;
 }

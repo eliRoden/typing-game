@@ -6,7 +6,6 @@ import './style.css';
 export default function App() {
   const [prompt, setPrompt] = useState(null);
   const [error, setError] = useState(null);
-  const [time, setTime] = useState(15);
   const languageDirectories = [
     'c',
     'cpp',
@@ -89,11 +88,42 @@ export default function App() {
     return <div>Error: {error.message}</div>;
   }
 
+  const [timerStarted, setTimerStarted] = useState(false);
+  const [time, setTime] = useState(10);
+  const [gameOver, setGameOver] = useState(false)
+
+  useEffect(() => {
+    let interval;
+
+    if (timerStarted) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime - 1);
+      }, 1000);
+    }
+
+    if (time === 0) {
+      clearInterval(interval);
+      setGameOver(true)
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [timerStarted, time]);
+
+  const startTimer = () => {
+    setTimerStarted(true);
+  };
+
   return (
     <main>
       <Header />
-      <h2 className="timer">{time}</h2>
-      {prompt ? <Game prompt={prompt} /> : <div>Loading</div>}
+      {timerStarted && <h2 className="timer">{time}</h2>}
+      {prompt ? <Game 
+        prompt={prompt} 
+        startTimer={startTimer}
+        gameOver={gameOver}
+       /> : <div>Loading</div>}
     </main>
   );
 }
