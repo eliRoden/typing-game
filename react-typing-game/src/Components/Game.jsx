@@ -11,6 +11,7 @@ export default function Game(props) {
     const [currentCharIndex, setCurrentCharIndex] = useState(0)
     const [charCorrectMap, setCharCorrectMap] = useState({})
     const [tokenCorrectMap, setTokenCorrectMap] = useState({})
+    const [linePosition, setLinePosition] = useState(0)
     const [lines, setLines] = useState(props.prompt.filter(line => line.trim() !== '').map(line => {
         const modifiedLine = line.replace(/\t/g, '    ')
         return modifiedLine
@@ -83,6 +84,17 @@ export default function Game(props) {
             if (currentChar !== ' ' && currentChar !== 'Enter') { //expected letter but got space
                 updateTokenMap(false, currentLineIndex, currentTokenIndex)
                 setCurrentTokenIndex(prevTokenIndex => prevTokenIndex+1)
+                if (currentTokenIndex + 1 === currentLine.length) {
+                    setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
+                    let i = 0
+                    while (lines[currentLineIndex+1].split(' ')[i] === '') {
+                        i++
+                    }
+                    setCurrentTokenIndex(i)
+                    if (currentLineIndex > 0) {
+                        setLinePosition(prevLinePosition => prevLinePosition - 35)
+                    }
+                }
             } else if (currentChar !== ' ') { //expected 'Enter' but got space, same result as if pressed 'Enter'
                 setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
                 let i = 0
@@ -90,6 +102,9 @@ export default function Game(props) {
                     i++
                 }
                 setCurrentTokenIndex(i)
+                if (currentLineIndex > 0) {
+                    setLinePosition(prevLinePosition => prevLinePosition - 35)
+                }
             } else { //expected space, got space
                 for (let i = 0; i < currentCharIndex; i++) {
                     if (charCorrectMap[currentLineIndex][currentTokenIndex][i] < 0) {
@@ -121,6 +136,9 @@ export default function Game(props) {
             }
             setCurrentTokenIndex(i)
             setCurrentCharIndex(0)
+            if (currentLineIndex > 0) {
+                setLinePosition(prevLinePosition => prevLinePosition - 35)
+            }
         } else if (isBackspace) {
             if (currentCharIndex > 0) { //backsapce in middle of token
                 setCurrentCharIndex(prevCharIndex => prevCharIndex-1)
@@ -207,9 +225,13 @@ export default function Game(props) {
 
     return (
         <div id="game" tabIndex="0">
-            <div className="text">
+            <div className="text"
+                style={{
+                    marginTop: `${linePosition}px`
+                }}
+            >
                 {lines.map((line, index) => (
-                    <Line 
+                    <Line
                         key={index}
                         isCurrent={index === currentLineIndex}
                         tokens={line}
@@ -226,7 +248,7 @@ export default function Game(props) {
             </div>
             <div id="cursor"
                 style={{
-                    position: cursorPosition?.top != 0 ? 'fixed' : 'absolute',
+                    position: cursorPosition?.top !== 0 ? 'fixed' : 'absolute',
                     top: cursorPosition?.top || 3,
                     left: cursorPosition?.left || 0
                 }}

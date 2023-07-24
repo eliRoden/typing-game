@@ -38,7 +38,7 @@ main {
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 1.7em;
   line-height: 1.1;
   font-family: Lexend Deca, sans-serif;
   margin-bottom: auto;
@@ -50,13 +50,16 @@ h1 {
   font-family: 'Roboto Mono';
   font-size: 1rem;
   position: relative;
+  overflow: hidden;
+  line-height: 35px;
+  height: 105px;
 }
 
 h2 {
   margin-bottom: 0;
   margin-top: auto;
   color: #e2b714;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-family: 'Roboto Mono', sans-serif;
 }
 
@@ -70,13 +73,12 @@ h2 {
 
 .text {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   white-space: pre-wrap;
   color: #646669;
   /*border: 1px solid green;*/
   line-height: 35px;
   height: 105px;
-  overflow: hidden;
   font-family: 'Roboto Mono';
   filter: blur(5px);
 }
