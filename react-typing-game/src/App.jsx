@@ -60,7 +60,6 @@ export default function App() {
                   code.startsWith('//') ||
                   code.startsWith('#')
                 ) {
-                  console.log('in loop');
                   if (code.startsWith(' ') || code.startsWith('\n')) {
                     code = code.substring(1);
                   } else if (code.startsWith('//') || code.startsWith('#')) {
@@ -88,9 +87,14 @@ export default function App() {
     return <div>Error: {error.message}</div>;
   }
 
+  const [timeLimit, setTimeLimit] = useState(10)
   const [timerStarted, setTimerStarted] = useState(false);
-  const [time, setTime] = useState(10);
+  const [time, setTime] = useState(timeLimit);
   const [gameOver, setGameOver] = useState(false)
+
+  useEffect(() => {
+    setTime(timeLimit)
+  }, [timeLimit])
 
   useEffect(() => {
     let interval;
@@ -115,14 +119,34 @@ export default function App() {
     setTimerStarted(true);
   };
 
+  const [WPM, setWPM] = useState(null)
+  const [accuracy, setAccuracy] = useState(null)
+
+  function setWordsPerMinute(wpm) {
+    setWPM(wpm)
+  }
+
+  function setAcurracy(acc) {
+    setAccuracy(acc)
+  }
+
   return (
     <main>
       <Header />
-      {timerStarted && <h2 className="timer">{time}</h2>}
+      {timerStarted && !gameOver && <h2 className="timer">{time}</h2>}
+      {gameOver && (
+        <h2>
+          <span style={{ marginRight: '80px' }}>WPM: {WPM}</span>
+          <span>Acc: {accuracy}%</span>
+        </h2>
+      )}
       {prompt ? <Game 
         prompt={prompt} 
         startTimer={startTimer}
         gameOver={gameOver}
+        timeLimit={timeLimit}
+        setWordsPerMinute={setWordsPerMinute}
+        setAccuracy={setAcurracy}
        /> : <div>Loading</div>}
     </main>
   );

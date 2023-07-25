@@ -94,6 +94,7 @@ export default function Game(props) {
             }
         } else if (isSpace) {
             if (currentChar !== ' ' && currentChar !== 'Enter') { //expected letter but got space
+                updateCharMap(false, currentTokenIndex, currentCharIndex)
                 updateTokenMap(false, currentLineIndex, currentTokenIndex)
                 setCurrentTokenIndex(prevTokenIndex => prevTokenIndex+1)
                 if (currentTokenIndex + 1 === currentLine.length) {
@@ -108,6 +109,12 @@ export default function Game(props) {
                     }
                 }
             } else if (currentChar !== ' ') { //expected 'Enter' but got space, same result as if pressed 'Enter'
+                for (let i = 0; i < currentCharIndex; i++) {
+                    if (charCorrectMap[currentLineIndex][currentTokenIndex][i] < 0) {
+                        updateTokenMap(false, currentLineIndex, currentTokenIndex)
+                        break
+                    }
+                }
                 setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
                 let i = 0
                 while (lines[currentLineIndex+1].split(' ')[i] === '') {
@@ -139,6 +146,12 @@ export default function Game(props) {
                             updateCharMap(false,i, j)
                         }
                     }
+                }
+            }
+            for (let i = 0; i < currentCharIndex; i++) {
+                if (charCorrectMap[currentLineIndex][currentTokenIndex][i] < 0) {
+                    updateTokenMap(false, currentLineIndex, currentTokenIndex)
+                    break
                 }
             }
             setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
@@ -214,6 +227,52 @@ export default function Game(props) {
         }))
     }
 
+    if (props.gameOver) {
+        let totalWords = 0
+        for (let i = 0; i < currentLineIndex+1; i++) {
+            let iLine = lines[i].split(' ')
+            for (let j = 0; j < iLine.length; j++) {
+                if (iLine[j] !== '') {
+                    totalWords++ 
+                    if (i === currentLineIndex && j >= currentTokenIndex) {
+                        totalWords--
+                    }
+                }
+            }
+        }
+        let incorrectWords = 0
+        Object.keys(tokenCorrectMap).forEach((lineIndex) => {
+            // Get the inner object (tokenIndex) corresponding to the lineIndex
+            const tokenObj = tokenCorrectMap[lineIndex];
+            // Iterate through the inner object's values and count occurrences of 1
+            Object.values(tokenObj).forEach((tokenValue) => {
+              if (tokenValue === -1) {
+                incorrectWords++;
+              }
+            });
+          });
+        const correctWords = totalWords-incorrectWords
+        const wpm = correctWords / (props.timeLimit / 60)
+        props.setWordsPerMinute(wpm)
+        
+        let correctChars = 0
+        let totalChars = 0
+        Object.keys(charCorrectMap).forEach(lineIndex => {
+            const tokenIndex = charCorrectMap[lineIndex]
+            Object.keys(tokenIndex).forEach(tokenIndex => {
+                const char = charCorrectMap[lineIndex][tokenIndex]
+                Object.values(char).forEach(charVal => {
+                    if (charVal === 1) {
+                        correctChars++
+                    }
+                    totalChars++
+                })
+            })
+        })
+        const accuracy = correctChars / totalChars * 100
+        props.setAccuracy(Math.round(accuracy))
+      }
+
     //console.log('tokenMap', tokenCorrectMap)
     //console.log('charMap', charCorrectMap)
 
@@ -234,7 +293,6 @@ export default function Game(props) {
         }
     }, [currentLineIndex, currentCharIndex, currentTokenIndex]);
 
-    console.log(cursorPosition)
 
     return (
             <div id="game" tabIndex="0" className={props.gameOver ? 'over' : ''}>
