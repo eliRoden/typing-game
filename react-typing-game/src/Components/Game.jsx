@@ -42,6 +42,9 @@ export default function Game(props) {
             : currentToken[currentCharIndex]
 
         if (props.gameOver) {
+            setCurrentCharIndex(0)
+            setCurrentLineIndex(0)
+            setCurrentTokenIndex(0)
             return
         }
         
@@ -156,7 +159,7 @@ export default function Game(props) {
             }
             setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
             let i = 0
-            while (lines[currentLineIndex+1].split(' ')[i] === '') {
+            while (lines[currentLineIndex+1]?.split(' ')[i] === '') {
                 i++
             }
             setCurrentTokenIndex(i)
@@ -227,51 +230,56 @@ export default function Game(props) {
         }))
     }
 
-    if (props.gameOver) {
-        let totalWords = 0
-        for (let i = 0; i < currentLineIndex+1; i++) {
-            let iLine = lines[i].split(' ')
-            for (let j = 0; j < iLine.length; j++) {
-                if (iLine[j] !== '') {
-                    totalWords++ 
-                    if (i === currentLineIndex && j >= currentTokenIndex) {
-                        totalWords--
+    useEffect(() => {
+        if (props.gameOver) {
+            let totalWords = 0
+            for (let i = 0; i < currentLineIndex+1; i++) {
+                let iLine = lines[i].split(' ')
+                for (let j = 0; j < iLine.length; j++) {
+                    if (iLine[j] !== '') {
+                        totalWords++ 
+                        if (i === currentLineIndex && j >= currentTokenIndex) {
+                            totalWords--
+                        }
                     }
                 }
             }
-        }
-        let incorrectWords = 0
-        Object.keys(tokenCorrectMap).forEach((lineIndex) => {
-            // Get the inner object (tokenIndex) corresponding to the lineIndex
-            const tokenObj = tokenCorrectMap[lineIndex];
-            // Iterate through the inner object's values and count occurrences of 1
-            Object.values(tokenObj).forEach((tokenValue) => {
-              if (tokenValue === -1) {
-                incorrectWords++;
-              }
-            });
-          });
-        const correctWords = totalWords-incorrectWords
-        const wpm = correctWords / (props.timeLimit / 60)
-        props.setWordsPerMinute(wpm)
-        
-        let correctChars = 0
-        let totalChars = 0
-        Object.keys(charCorrectMap).forEach(lineIndex => {
-            const tokenIndex = charCorrectMap[lineIndex]
-            Object.keys(tokenIndex).forEach(tokenIndex => {
-                const char = charCorrectMap[lineIndex][tokenIndex]
-                Object.values(char).forEach(charVal => {
-                    if (charVal === 1) {
-                        correctChars++
-                    }
-                    totalChars++
+            let incorrectWords = 0
+            Object.keys(tokenCorrectMap).forEach((lineIndex) => {
+                // Get the inner object (tokenIndex) corresponding to the lineIndex
+                const tokenObj = tokenCorrectMap[lineIndex];
+                // Iterate through the inner object's values and count occurrences of 1
+                Object.values(tokenObj).forEach((tokenValue) => {
+                  if (tokenValue === -1) {
+                    incorrectWords++;
+                  }
+                });
+              });
+            const correctWords = totalWords-incorrectWords
+            const wpm = correctWords / (props.timeLimit / 60)
+            const raw = totalWords / (props.timeLimit / 60)
+            props.setWordsPerMinute(wpm)
+            props.setRaw(raw)
+            
+            let correctChars = 0
+            let totalChars = 0
+            Object.keys(charCorrectMap).forEach(lineIndex => {
+                const tokenIndex = charCorrectMap[lineIndex]
+                Object.keys(tokenIndex).forEach(tokenIndex => {
+                    const char = charCorrectMap[lineIndex][tokenIndex]
+                    Object.values(char).forEach(charVal => {
+                        if (charVal === 1) {
+                            correctChars++
+                        }
+                        totalChars++
+                    })
                 })
             })
-        })
-        const accuracy = correctChars / totalChars * 100
-        props.setAccuracy(Math.round(accuracy))
-      }
+            const accuracy = correctChars / totalChars * 100
+            props.setAccuracy(Math.round(accuracy))
+          }
+    }, [props.gameOver])
+    
 
     //console.log('tokenMap', tokenCorrectMap)
     //console.log('charMap', charCorrectMap)

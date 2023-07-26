@@ -6,6 +6,7 @@ import './style.css';
 export default function App() {
   const [prompt, setPrompt] = useState(null);
   const [error, setError] = useState(null);
+  const [nextGame, setNextGame] = useState(0)
   const languageDirectories = [
     'c',
     'cpp',
@@ -81,13 +82,13 @@ export default function App() {
       .catch((error) => {
         setError(error);
       });
-  }, []);
+  }, [nextGame]);
 
   if (error) {
     return <div>Error: {error.message}</div>;
   }
 
-  const [timeLimit, setTimeLimit] = useState(10)
+  const [timeLimit, setTimeLimit] = useState(30)
   const [timerStarted, setTimerStarted] = useState(false);
   const [time, setTime] = useState(timeLimit);
   const [gameOver, setGameOver] = useState(false)
@@ -121,6 +122,7 @@ export default function App() {
 
   const [WPM, setWPM] = useState(null)
   const [accuracy, setAccuracy] = useState(null)
+  const [raw, setRAW] = useState(null)
 
   function setWordsPerMinute(wpm) {
     setWPM(wpm)
@@ -130,14 +132,33 @@ export default function App() {
     setAccuracy(acc)
   }
 
+  function setRaw(raw) {
+    setRAW(raw)
+  }
+
+  function goNextGame() {
+    setNextGame(prevGame => prevGame+1)
+    setGameOver(false)
+    setPrompt(null)
+    setTimerStarted(false)
+    setTime(timeLimit)
+  }
+
   return (
-    <main>
+    <main >
       <Header />
+      {!timerStarted && <div id='selection'>
+        <button className={timeLimit === 15 ? 'current' : ''} onClick={() => setTimeLimit(15)}>15</button>
+        <button className={timeLimit === 30 ? 'current' : ''} onClick={() => setTimeLimit(30)}>30</button>
+        <button className={timeLimit === 60 ? 'current' : ''} onClick={() => setTimeLimit(60)}>60</button>
+        <button className={timeLimit === 120 ? 'current' : ''} onClick={() => setTimeLimit(120)}>120</button>
+      </div>}
       {timerStarted && !gameOver && <h2 className="timer">{time}</h2>}
       {gameOver && (
-        <h2>
+        <h2 className="stats">
           <span style={{ marginRight: '80px' }}>WPM: {WPM}</span>
-          <span>Acc: {accuracy}%</span>
+          <span style={{ marginRight: '80px' }}>Acc: {accuracy}%</span>
+          <span>Raw: {raw}</span>
         </h2>
       )}
       {prompt ? <Game 
@@ -147,7 +168,10 @@ export default function App() {
         timeLimit={timeLimit}
         setWordsPerMinute={setWordsPerMinute}
         setAccuracy={setAcurracy}
-       /> : <div>Loading</div>}
+        setRaw={setRaw}
+       /> : <div id='game'>Loading</div>}
+       {gameOver && <div id="nextGame"><svg  className="next" onClick={goNextGame} xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
+          <span id="hoverText" >Next test</span></div>}
     </main>
   );
 }
