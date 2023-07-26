@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Header from './Components/Header';
 import Game from './Components/Game';
+import Language from './Components/Language'
 import './style.css';
 
 export default function App() {
@@ -22,19 +23,20 @@ export default function App() {
     'scala',
     'swift',
     'typescript',
-  ];
+  ]
+  const[languages, setLanguages] = useState(languageDirectories)
 
   useEffect(() => {
     fetch('https://api.github.com/repos/neetcode-gh/leetcode/contents')
       .then((response) => response.json())
       .then((contents) => {
         // Get language directories
-        const languages = contents.filter(
-          (item) => item.type === 'dir' && languageDirectories.includes(item.name)
+        const filteredLanguages = contents.filter(
+          (item) => item.type === 'dir' && languages.includes(item.name)
         );
 
         // Select a random language
-        const randomLanguage = languages[Math.floor(Math.random() * languages.length)];
+        const randomLanguage = filteredLanguages[Math.floor(Math.random() * filteredLanguages.length)];
 
         // Fetch the problems in that language
         fetch(randomLanguage.url)
@@ -82,7 +84,7 @@ export default function App() {
       .catch((error) => {
         setError(error);
       });
-  }, [nextGame]);
+  }, [nextGame, languages]);
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -144,14 +146,49 @@ export default function App() {
     setTime(timeLimit)
   }
 
+  const arraysEqual = (arr1, arr2) => {
+    return arr1.length === arr2.length && arr1.every((value, index) => value === arr2[index]);
+  }
+
+  function handleLanguages(language) {
+    setPrompt(null)
+    if (arraysEqual(languages, languageDirectories)) {
+      setLanguages([language])
+    } else if (languages.includes(language)) {
+      if (arraysEqual(languages, [language])) {
+        setLanguages(languageDirectories)
+      } else {
+        setLanguages(prevLanguages => prevLanguages.filter(lang => lang !== language))
+      }
+    } else {
+      setLanguages(prevLanguages => [...prevLanguages, language])
+    }
+  }
+
   return (
     <main >
       <Header />
       {!timerStarted && <div id='selection'>
-        <button className={timeLimit === 15 ? 'current' : ''} onClick={() => setTimeLimit(15)}>15</button>
-        <button className={timeLimit === 30 ? 'current' : ''} onClick={() => setTimeLimit(30)}>30</button>
-        <button className={timeLimit === 60 ? 'current' : ''} onClick={() => setTimeLimit(60)}>60</button>
-        <button className={timeLimit === 120 ? 'current' : ''} onClick={() => setTimeLimit(120)}>120</button>
+        <div id='language'>
+          <button className={arraysEqual(languages,languageDirectories) ? 'current' : ''} 
+            onClick={() => setLanguages(languageDirectories)}>random</button>
+          <div id="spacer" style={{marginTop: 5 + 'px'}}></div>
+          {languageDirectories.map((language, index) => (
+            <Language 
+              key={index}
+              language={language}
+              arraysEqual={arraysEqual(languages,languageDirectories)} 
+              includes={languages.includes(language)}
+              handleLanguages={handleLanguages}
+            />
+          ))}
+        </div>
+        <div id='time'>
+          <button className={timeLimit === 15 ? 'current' : ''} onClick={() => setTimeLimit(15)}>15</button>
+          <button className={timeLimit === 30 ? 'current' : ''} onClick={() => setTimeLimit(30)}>30</button>
+          <button className={timeLimit === 60 ? 'current' : ''} onClick={() => setTimeLimit(60)}>60</button>
+          <button className={timeLimit === 120 ? 'current' : ''} onClick={() => setTimeLimit(120)}>120</button>
+        </div>
       </div>}
       {timerStarted && !gameOver && <h2 className="timer">{time}</h2>}
       {gameOver && (
