@@ -253,6 +253,9 @@ export default function Game(props) {
                   if (tokenValue === -1) {
                     incorrectWords++;
                   }
+                  if (tokenValue.length >= 15) {
+                    incorrectWords--;
+                }
                 });
               });
             const correctWords = totalWords-incorrectWords
