@@ -35,7 +35,7 @@ h1 {
 #game {
   margin-bottom: 21rem;
   /*border: 1px solid blue;*/
-  font-family: 'Roboto Mono';
+  font-family: 'Roboto Mono', sans-serif;
   font-size: 1rem;
   position: relative;
   overflow: hidden;
@@ -71,7 +71,7 @@ h2 {
   /*border: 1px solid green;*/
   line-height: 35px;
   height: 105px;
-  font-family: 'Roboto Mono';
+  font-family: 'Roboto Mono', sans-serif;
   filter: blur(5px);
 }
 #game:focus {
@@ -168,7 +168,7 @@ h2 {
 
 #hoverText {
   display: none;
-  font-family: inherit;
+  font-family: 'Roboto Mono', sans-serif;
   background-color: #000;
   position: absolute;
   left: 50%;

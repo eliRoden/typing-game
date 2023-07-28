@@ -101,6 +101,10 @@ export default function Game(props) {
                 updateTokenMap(false, currentLineIndex, currentTokenIndex)
                 setCurrentTokenIndex(prevTokenIndex => prevTokenIndex+1)
                 if (currentTokenIndex + 1 === currentLine.length) {
+                    if (currentLineIndex + 1 === lines.length) {
+                        props.endGame()
+                        return
+                    }
                     setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
                     let i = 0
                     while (lines[currentLineIndex+1].split(' ')[i] === '') {
@@ -118,6 +122,10 @@ export default function Game(props) {
                         break
                     }
                 }
+                if (currentLineIndex + 1 === lines.length) {
+                    props.endGame()
+                    return
+                }
                 setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
                 let i = 0
                 while (lines[currentLineIndex+1].split(' ')[i] === '') {
@@ -133,6 +141,10 @@ export default function Game(props) {
                         updateTokenMap(false, currentLineIndex, currentTokenIndex)
                         break
                     }
+                }
+                if (currentLineIndex + 1 === lines.length) {
+                    props.endGame()
+                    return
                 }
                 setCurrentTokenIndex(prevTokenIndex => prevTokenIndex+1)
             }
@@ -156,6 +168,10 @@ export default function Game(props) {
                     updateTokenMap(false, currentLineIndex, currentTokenIndex)
                     break
                 }
+            }
+            if (currentLineIndex + 1 === lines.length) {
+                props.endGame()
+                return
             }
             setCurrentLineIndex(prevLineIndex => prevLineIndex + 1)
             let i = 0
@@ -233,13 +249,19 @@ export default function Game(props) {
     useEffect(() => {
         if (props.gameOver) {
             let totalWords = 0
+            let adjustedTotalWords = 0
             for (let i = 0; i < currentLineIndex+1; i++) {
                 let iLine = lines[i].split(' ')
                 for (let j = 0; j < iLine.length; j++) {
                     if (iLine[j] !== '') {
                         totalWords++ 
+                        adjustedTotalWords++
+                        if (iLine[j].length >= 15) {
+                            adjustedTotalWords++
+                        }
                         if (i === currentLineIndex && j >= currentTokenIndex) {
                             totalWords--
+                            adjustedTotalWords--
                         }
                     }
                 }
@@ -247,20 +269,24 @@ export default function Game(props) {
             let incorrectWords = 0
             Object.keys(tokenCorrectMap).forEach((lineIndex) => {
                 // Get the inner object (tokenIndex) corresponding to the lineIndex
-                const tokenObj = tokenCorrectMap[lineIndex];
+                const tokens = tokenCorrectMap[lineIndex];
                 // Iterate through the inner object's values and count occurrences of 1
-                Object.values(tokenObj).forEach((tokenValue) => {
-                  if (tokenValue === -1) {
-                    incorrectWords++;
-                  }
-                  if (tokenValue.length >= 15) {
-                    incorrectWords--;
-                }
+                Object.values(tokens).forEach((tokenValue, i) => {
+                    if (tokenValue === -1) {
+                        incorrectWords++;
+                    }
                 });
               });
-            const correctWords = totalWords-incorrectWords
+            let correctWords
+            if (totalWords === incorrectWords) {
+                correctWords = 0
+            } else {
+                correctWords = adjustedTotalWords-incorrectWords
+            }
             const wpm = correctWords / (props.timeLimit / 60)
             const raw = totalWords / (props.timeLimit / 60)
+            console.log(totalWords)
+            console.log(incorrectWords)
             props.setWordsPerMinute(wpm)
             props.setRaw(raw)
             

@@ -127,7 +127,14 @@ export default function App() {
   const [raw, setRAW] = useState(null)
 
   function setWordsPerMinute(wpm) {
-    setWPM(wpm)
+    if (time === 0) {
+      setWPM(wpm)
+    }
+    else {
+      const actualTime = timeLimit-time;
+      const ratio = timeLimit / actualTime;
+      setWPM(wpm * ratio)
+    }
   }
 
   function setAcurracy(acc) {
@@ -135,7 +142,18 @@ export default function App() {
   }
 
   function setRaw(raw) {
-    setRAW(raw)
+    if (time === 0) {
+      setRAW(raw)
+    }
+    else {
+      const actualTime = timeLimit-time;
+      const ratio = timeLimit / actualTime;
+      setRAW(Math.round(raw * ratio))
+    }
+  }
+
+  function endGame() {
+    setGameOver(true)
   }
 
   function goNextGame() {
@@ -206,6 +224,7 @@ export default function App() {
         setWordsPerMinute={setWordsPerMinute}
         setAccuracy={setAcurracy}
         setRaw={setRaw}
+        endGame={endGame}
        /> : <div id='game'>Loading</div>}
        {gameOver && <div id="nextGame"><svg  className="next" onClick={goNextGame} xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>
           <span id="hoverText" >Next test</span></div>}
